@@ -14,8 +14,8 @@ import { GenerateResult, OutputMode, Palette } from '@/types';
 export default function HomePage() {
   const [image, setImage] = useState<HTMLImageElement | null>(null);
   const [selectedPalette, setSelectedPalette] = useState<Palette>(palettes[0]);
-  const [gridWidth, setGridWidth] = useState(45);
-  const [gridHeight, setGridHeight] = useState(45);
+  const [gridWidth, setGridWidth] = useState(58);
+  const [gridHeight, setGridHeight] = useState(58);
   const [outputMode, setOutputMode] = useState<OutputMode>(OutputMode.All);
   const [result, setResult] = useState<GenerateResult | null>(null);
   const [generating, setGenerating] = useState(false);

@@ -25,83 +25,79 @@ export function generatePixelData(
   params: GenerateParams
 ): GenerateResult {
   const { gridWidth, gridHeight, palette } = params;
-  const pixels = imageData.data;
-  const imgW = imageData.width;
-  const imgH = imageData.height;
-  const gridSize = gridWidth * gridHeight;
-  const outData = new Uint8ClampedArray(gridSize * 4);
   const colorMap = new Map<string, number>();
   const usedColorSet = new Map<string, PaletteColor>();
 
-  const scaleX = imgW / gridWidth;
-  const scaleY = imgH / gridHeight;
+  const srcCanvas = document.createElement('canvas');
+  srcCanvas.width = imageData.width;
+  srcCanvas.height = imageData.height;
+  const srcCtx = srcCanvas.getContext('2d')!;
+  srcCtx.putImageData(imageData, 0, 0);
+
+  const thumbCanvas = document.createElement('canvas');
+  thumbCanvas.width = gridWidth;
+  thumbCanvas.height = gridHeight;
+  const thumbCtx = thumbCanvas.getContext('2d')!;
+  thumbCtx.imageSmoothingEnabled = true;
+  thumbCtx.imageSmoothingQuality = 'high';
+  thumbCtx.drawImage(srcCanvas, 0, 0, gridWidth, gridHeight);
+
+  const downscaled = thumbCtx.getImageData(0, 0, gridWidth, gridHeight);
+  const pixels = downscaled.data;
+
+  const scaleX = imageData.width / gridWidth;
+  const scaleY = imageData.height / gridHeight;
 
   const cellColors: [number, number, number][] = [];
 
   for (let gy = 0; gy < gridHeight; gy++) {
     for (let gx = 0; gx < gridWidth; gx++) {
-      const x0 = Math.floor(gx * scaleX);
-      const y0 = Math.floor(gy * scaleY);
-      const x1 = Math.floor((gx + 1) * scaleX);
-      const y1 = Math.floor((gy + 1) * scaleY);
-
-      let sumR = 0, sumG = 0, sumB = 0, count = 0;
-      for (let py = y0; py < y1; py++) {
-        for (let px = x0; px < x1; px++) {
-          const idx = (py * imgW + px) * 4;
-          sumR += pixels[idx];
-          sumG += pixels[idx + 1];
-          sumB += pixels[idx + 2];
-          count++;
-        }
-      }
-
-      const avgR = Math.round(sumR / count);
-      const avgG = Math.round(sumG / count);
-      const avgB = Math.round(sumB / count);
-      cellColors.push([avgR, avgG, avgB]);
+      const idx = (gy * gridWidth + gx) * 4;
+      cellColors.push([pixels[idx], pixels[idx + 1], pixels[idx + 2]]);
     }
   }
 
-  const errors: [number, number, number][] = new Array(gridSize).fill([0, 0, 0]).map(() => [0, 0, 0]);
+  const outData = new Uint8ClampedArray(gridWidth * gridHeight * 4);
+  const errR: number[][] = Array.from({ length: gridHeight }, () => new Array(gridWidth).fill(0));
+  const errG: number[][] = Array.from({ length: gridHeight }, () => new Array(gridWidth).fill(0));
+  const errB: number[][] = Array.from({ length: gridHeight }, () => new Array(gridWidth).fill(0));
 
   for (let gy = 0; gy < gridHeight; gy++) {
     for (let gx = 0; gx < gridWidth; gx++) {
       const idx = gy * gridWidth + gx;
       const [ar, ag, ab] = cellColors[idx];
-      const [er, eg, eb] = errors[idx];
-      const adjustedR = Math.min(255, Math.max(0, Math.round(ar + er)));
-      const adjustedG = Math.min(255, Math.max(0, Math.round(ag + eg)));
-      const adjustedB = Math.min(255, Math.max(0, Math.round(ab + eb)));
+      const r = Math.min(255, Math.max(0, Math.round(ar + errR[gy][gx])));
+      const g = Math.min(255, Math.max(0, Math.round(ag + errG[gy][gx])));
+      const b = Math.min(255, Math.max(0, Math.round(ab + errB[gy][gx])));
 
-      const nearest = findNearestColor([adjustedR, adjustedG, adjustedB], palette.colors);
+      const nearest = findNearestColor([r, g, b], palette.colors);
       const [mr, mg, mb] = nearest.rgb;
 
-      const errR = adjustedR - mr;
-      const errG = adjustedG - mg;
-      const errB = adjustedB - mb;
+      const derrR = r - mr;
+      const derrG = g - mg;
+      const derrB = b - mb;
 
-      const outIdx = idx * 4;
-      outData[outIdx] = mr;
-      outData[outIdx + 1] = mg;
-      outData[outIdx + 2] = mb;
-      outData[outIdx + 3] = 255;
+      const oi = idx * 4;
+      outData[oi] = mr;
+      outData[oi + 1] = mg;
+      outData[oi + 2] = mb;
+      outData[oi + 3] = 255;
 
       const key = nearest.code;
       colorMap.set(key, (colorMap.get(key) || 0) + 1);
       usedColorSet.set(key, nearest);
 
-      const distribute = (tx: number, ty: number, w: number) => {
+      const distort = (tx: number, ty: number, w: number) => {
         if (tx < 0 || tx >= gridWidth || ty < 0 || ty >= gridHeight) return;
-        const eIdx = ty * gridWidth + tx;
-        const prev = errors[eIdx];
-        errors[eIdx] = [prev[0] + errR * w, prev[1] + errG * w, prev[2] + errB * w];
+        errR[ty][tx] += derrR * w;
+        errG[ty][tx] += derrG * w;
+        errB[ty][tx] += derrB * w;
       };
 
-      distribute(gx + 1, gy, 7 / 16);
-      distribute(gx - 1, gy + 1, 3 / 16);
-      distribute(gx, gy + 1, 5 / 16);
-      distribute(gx + 1, gy + 1, 1 / 16);
+      distort(gx + 1, gy, 7 / 16);
+      distort(gx - 1, gy + 1, 3 / 16);
+      distort(gx, gy + 1, 5 / 16);
+      distort(gx + 1, gy + 1, 1 / 16);
     }
   }
 
