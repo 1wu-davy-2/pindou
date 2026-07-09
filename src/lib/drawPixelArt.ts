@@ -3,6 +3,25 @@ import { GenerateResult } from '@/types';
 const CELL_GAP = 1;
 const LABEL_FONT_SIZE = 10;
 
+export function setupHiDpiCanvas(
+  canvas: HTMLCanvasElement,
+  logicalWidth: number,
+  logicalHeight: number,
+  pixelRatio = typeof window === 'undefined' ? 1 : window.devicePixelRatio || 1
+): CanvasRenderingContext2D {
+  const ratio = Math.max(1, pixelRatio);
+  canvas.width = Math.round(logicalWidth * ratio);
+  canvas.height = Math.round(logicalHeight * ratio);
+  canvas.style.width = `${logicalWidth}px`;
+  canvas.style.height = 'auto';
+  canvas.style.aspectRatio = `${logicalWidth} / ${logicalHeight}`;
+
+  const ctx = canvas.getContext('2d')!;
+  ctx.imageSmoothingEnabled = false;
+  ctx.scale(ratio, ratio);
+  return ctx;
+}
+
 export function drawPixelPreview(
   canvas: HTMLCanvasElement,
   result: GenerateResult,
@@ -11,9 +30,7 @@ export function drawPixelPreview(
   const { pixelData, gridWidth, gridHeight } = result;
   const w = gridWidth * (cellSize + CELL_GAP) + CELL_GAP;
   const h = gridHeight * (cellSize + CELL_GAP) + CELL_GAP;
-  canvas.width = w;
-  canvas.height = h;
-  const ctx = canvas.getContext('2d')!;
+  const ctx = setupHiDpiCanvas(canvas, w, h);
 
   ctx.fillStyle = '#e5e7eb';
   ctx.fillRect(0, 0, w, h);
@@ -21,7 +38,10 @@ export function drawPixelPreview(
   for (let y = 0; y < gridHeight; y++) {
     for (let x = 0; x < gridWidth; x++) {
       const idx = (y * gridWidth + x) * 4;
-      const [r, g, b, a] = pixelData.data.slice(idx, idx + 4);
+      const r = pixelData.data[idx];
+      const g = pixelData.data[idx + 1];
+      const b = pixelData.data[idx + 2];
+      const a = pixelData.data[idx + 3];
       ctx.fillStyle = `rgba(${r},${g},${b},${a / 255})`;
       ctx.fillRect(
         CELL_GAP + x * (cellSize + CELL_GAP),
@@ -46,9 +66,7 @@ export function drawColorCodeView(
 
   const w = gridWidth * (cellSize + CELL_GAP) + CELL_GAP;
   const h = gridHeight * (cellSize + CELL_GAP) + CELL_GAP;
-  canvas.width = w;
-  canvas.height = h;
-  const ctx = canvas.getContext('2d')!;
+  const ctx = setupHiDpiCanvas(canvas, w, h);
 
   ctx.fillStyle = '#e5e7eb';
   ctx.fillRect(0, 0, w, h);
