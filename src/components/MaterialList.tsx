@@ -16,14 +16,14 @@ export default function MaterialList({ result }: MaterialListProps) {
   });
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-      <div className="px-4 py-3 border-b border-gray-100">
-        <h3 className="font-medium text-sm">耗材清单</h3>
-        <p className="text-xs text-gray-400 mt-0.5">
-          共 {sorted.length} 种颜色 · {result.gridWidth * result.gridHeight} 颗拼豆
+    <div className="soft-panel overflow-hidden rounded-lg">
+      <div className="border-b border-[#ffe1ec] px-5 py-4">
+        <h3 className="text-base font-black text-[#503040]">物料清单</h3>
+        <p className="mt-0.5 text-xs text-[#9b7b8a]">
+          共 {sorted.length} 种颜色，约 {result.gridWidth * result.gridHeight} 颗拼豆
         </p>
       </div>
-      <div className="divide-y divide-gray-50 max-h-64 overflow-y-auto">
+      <div className="hide-scrollbar max-h-72 divide-y divide-[#fff0f5] overflow-y-auto">
         {sorted.map((color) => {
           const count = result.colorMap.get(color.code) || 0;
           const bgColor = `rgb(${color.rgb[0]},${color.rgb[1]},${color.rgb[2]})`;
@@ -31,16 +31,16 @@ export default function MaterialList({ result }: MaterialListProps) {
           const textColor = brightness > 128 ? '#000' : '#fff';
 
           return (
-            <div key={color.code} className="flex items-center gap-3 px-4 py-2 text-sm">
+            <div key={color.code} className="flex items-center gap-3 px-5 py-3 text-sm">
               <div
-                className="w-6 h-6 rounded border border-gray-200 flex items-center justify-center text-[8px] font-mono shrink-0"
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 border-white text-[9px] font-black shadow-sm ring-1 ring-black/5"
                 style={{ backgroundColor: bgColor, color: textColor }}
               >
                 {color.code}
               </div>
-              <span className="flex-1 text-gray-600">{color.name}</span>
-              <span className="text-gray-400 text-xs">{color.code}</span>
-              <span className="font-mono text-gray-700">{count}</span>
+              <span className="flex-1 font-semibold text-[#6f5261]">{color.name}</span>
+              <span className="rounded-full bg-white/70 px-2 py-1 text-xs font-bold text-[#a17386]">{color.code}</span>
+              <span className="min-w-12 text-right font-mono font-black text-[#503040]">{count}</span>
             </div>
           );
         })}

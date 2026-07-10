@@ -1,1 +1,66 @@
 @import "tailwindcss";
+
+:root {
+  --ink: #3f2b3a;
+  --muted: #8d7482;
+  --rose: #ff6f9f;
+  --rose-soft: #ffd6e4;
+  --peach: #ffb783;
+  --butter: #ffe89a;
+  --mint: #95e6c8;
+  --aqua: #8eddf2;
+  --lavender: #c9b7ff;
+  --paper: rgba(255, 255, 255, 0.82);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: #fff7fb;
+}
+
+body {
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 12% 12%, rgba(255, 111, 159, 0.2), transparent 28%),
+    radial-gradient(circle at 86% 18%, rgba(149, 230, 200, 0.24), transparent 24%),
+    radial-gradient(circle at 70% 80%, rgba(201, 183, 255, 0.22), transparent 30%),
+    linear-gradient(135deg, #fff9fc 0%, #fff7ec 45%, #f2fffb 100%);
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+.bead-surface {
+  background-image:
+    radial-gradient(circle, rgba(255, 111, 159, 0.16) 0 3px, transparent 3.5px),
+    radial-gradient(circle, rgba(149, 230, 200, 0.16) 0 3px, transparent 3.5px);
+  background-position: 0 0, 16px 16px;
+  background-size: 32px 32px;
+}
+
+.soft-panel {
+  border: 1px solid rgba(255, 139, 178, 0.28);
+  background: var(--paper);
+  box-shadow: 0 24px 70px rgba(129, 67, 96, 0.14);
+  backdrop-filter: blur(18px);
+}
+
+.candy-shadow {
+  box-shadow:
+    0 16px 36px rgba(255, 111, 159, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75);
+}
+
+.hide-scrollbar {
+  scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}

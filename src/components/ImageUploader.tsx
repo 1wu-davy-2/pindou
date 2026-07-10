@@ -46,16 +46,17 @@ export default function ImageUploader({ onImageLoad }: ImageUploaderProps) {
 
   return (
     <div
-      className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors ${
+      className={`soft-panel group relative cursor-pointer overflow-hidden rounded-lg p-5 text-center transition-all duration-300 ${
         dragging
-          ? 'border-blue-500 bg-blue-50'
-          : 'border-gray-300 hover:border-gray-400'
+          ? 'scale-[1.01] border-[#ff6f9f] bg-[#fff0f6]'
+          : 'hover:-translate-y-0.5 hover:border-[#ff9abd]'
       }`}
       onDrop={handleDrop}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onClick={() => inputRef.current?.click()}
     >
+      <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-white to-transparent" />
       <input
         ref={inputRef}
         type="file"
@@ -66,19 +67,39 @@ export default function ImageUploader({ onImageLoad }: ImageUploaderProps) {
           if (file) handleFile(file);
         }}
       />
+
       {preview ? (
-        <img
-          src={preview}
-          alt="Preview"
-          className="max-h-64 mx-auto rounded-lg object-contain"
-        />
+        <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_180px] md:items-center">
+          <div className="rounded-lg bg-white/70 p-3 shadow-inner shadow-pink-100">
+            <img
+              src={preview}
+              alt="上传图片预览"
+              className="mx-auto max-h-80 rounded-lg object-contain"
+            />
+          </div>
+          <div className="text-left">
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#b65f7c]">图片已就绪</p>
+            <h2 className="mt-2 text-2xl font-black text-[#442b39]">可以生成拼豆图纸啦</h2>
+            <p className="mt-2 text-sm leading-6 text-[#8d7482]">想换一张图，直接点击这里重新上传。</p>
+          </div>
+        </div>
       ) : (
-        <div className="text-gray-400">
-          <svg className="w-12 h-12 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
-          <p className="text-sm">点击或拖拽上传图片</p>
-          <p className="text-xs mt-1">支持 JPG / PNG / WebP</p>
+        <div className="mx-auto max-w-xl py-8">
+          <div className="mx-auto mb-5 grid h-24 w-24 grid-cols-3 gap-2 rounded-[1.6rem] bg-white/80 p-3 shadow-inner shadow-pink-100">
+            {['#ff8ab3', '#ffe89a', '#95e6c8', '#c9b7ff', '#ffffff', '#ffb783', '#8eddf2', '#ffcfdf', '#ffffff'].map((color, index) => (
+              <span
+                key={`${color}-${index}`}
+                className="rounded-full border border-white shadow-sm ring-1 ring-black/5"
+                style={{ backgroundColor: color }}
+              />
+            ))}
+          </div>
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#b65f7c]">上传照片</p>
+          <h2 className="mt-2 text-2xl font-black text-[#442b39]">拖进来，做成拼豆小图纸</h2>
+          <p className="mt-2 text-sm text-[#8d7482]">支持 JPG / PNG / WebP，图片只在浏览器里处理。</p>
+          <div className="candy-shadow mt-5 inline-flex rounded-full bg-[#ff6f9f] px-5 py-2.5 text-sm font-bold text-white">
+            选择图片
+          </div>
         </div>
       )}
     </div>

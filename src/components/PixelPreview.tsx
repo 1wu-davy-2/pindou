@@ -21,7 +21,7 @@ const PixelPreview = forwardRef<HTMLCanvasElement, PixelPreviewProps>(
 
     if (!result) {
       return (
-        <div className="bg-gray-100 rounded-xl flex items-center justify-center aspect-square text-gray-400 text-sm">
+        <div className="flex aspect-square items-center justify-center rounded-lg bg-white/60 text-sm text-[#a98a99]">
           上传图片后生成预览
         </div>
       );
@@ -30,7 +30,7 @@ const PixelPreview = forwardRef<HTMLCanvasElement, PixelPreviewProps>(
     return (
       <canvas
         ref={canvasRef}
-        className="rounded-xl max-w-full mx-auto"
+        className="mx-auto max-w-full rounded-lg border border-white/80 bg-white shadow-inner shadow-pink-100"
         style={{ imageRendering: 'pixelated' }}
       />
     );

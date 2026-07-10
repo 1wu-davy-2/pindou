@@ -24,7 +24,7 @@ const ColorCodeView = forwardRef<HTMLCanvasElement, ColorCodeViewProps>(
     return (
       <canvas
         ref={canvasRef}
-        className="rounded-xl max-w-full mx-auto"
+        className="mx-auto max-w-full rounded-lg border border-white/80 bg-white shadow-inner shadow-pink-100"
         style={{ imageRendering: 'pixelated' }}
       />
     );
