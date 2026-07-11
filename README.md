@@ -3,6 +3,7 @@
 > **上传一张照片，生成可打印的拼豆图案。**  
 > 支持 Perler Beads · Hama Beads · Artkal Beads 三大品牌色板，所有处理在浏览器本地完成，无需上传服务器。
 
+
 <p align="center">
   <img src="https://img.shields.io/badge/Next.js-15-black?logo=next.js" alt="Next.js 15" />
   <img src="https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript" alt="TypeScript" />
